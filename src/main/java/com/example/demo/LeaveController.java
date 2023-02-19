@@ -2,7 +2,6 @@ package com.example.demo;
 
 import com.example.demo.entity.AppUser;
 import com.example.demo.entity.Leave;
-import com.example.demo.entity.LeaveStatus;
 import com.example.demo.repository.AppUserRepository;
 import com.example.demo.service.LeaveService;
 import org.springframework.stereotype.Controller;
@@ -33,7 +32,6 @@ public class LeaveController {
                                                   .orElseThrow(() -> new RuntimeException("User not found"));
 
         leaveRequest.setAppUserByRequestedByUserId(requestedByUserId);
-        leaveRequest.setStatus(LeaveStatus.REQUESTED);
 
         return leaveService.initLeave(leaveRequest);
     }

@@ -22,6 +22,10 @@ public class StepDef {
     @Basic
     @Column(name = "name", nullable = false, length = 50)
     private String name;
+
+    @Basic
+    @Column(name = "process_status", nullable = false, length = 50)
+    private String processStatus;
     @Basic
     @Column(name = "process_id", nullable = true)
     private Integer processId;
@@ -115,5 +119,17 @@ public class StepDef {
 
     public void setProcessDefByProcessId(ProcessDef processDefByProcessId) {
         this.processDefByProcessId = processDefByProcessId;
+    }
+
+    public String getProcessStatus() {
+        return processStatus;
+    }
+
+    public void setProcessStatus(String processStatus) {
+        this.processStatus = processStatus;
+    }
+
+    public Boolean getTerminalStep() {
+        return isTerminalStep;
     }
 }

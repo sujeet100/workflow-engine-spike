@@ -6,6 +6,7 @@ CREATE TABLE process_def (
 CREATE TABLE step_def (
 	step_id serial PRIMARY KEY,
 	name VARCHAR ( 50 ) UNIQUE NOT NULL,
+	process_status VARCHAR ( 50 ),
 	process_id INT REFERENCES process_def(process_id),
 	approver_role VARCHAR ( 50 ),
 	is_initial_step boolean,

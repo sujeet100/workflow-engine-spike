@@ -6,9 +6,9 @@ Insert into app_user values (5, 'Rahul Doe Mumbai Employee', 'EMPLOYEE', 'MUMBAI
 
 Insert into process_def values (1, 'LEAVE_APPLICATION');
 
-Insert into step_def values (1, 'LA_INITIATED', 1, 'CITY_MANAGER', true, false);
-Insert into step_def values (2, 'LA_STATE_MANAGER_APPROVAL', 1, 'STATE_MANAGER', false, false);
-Insert into step_def values (3, 'LA_APPROVED', 1, null, false, true);
+Insert into step_def values (1, 'LA_INITIATED', 'PENDING_WITH_CITY_MANAGER', 1, 'CITY_MANAGER', true, false);
+Insert into step_def values (2, 'LA_STATE_MANAGER_APPROVAL', 'PENDING_WITH_STATE_MANAGER', 1, 'STATE_MANAGER', false, false);
+Insert into step_def values (3, 'LA_APPROVED', 'APPROVED', 1, null, false, true);
 
 insert into step_transition values (1, 1, 1, 2, 'APPROVE');
 insert into step_transition values (2, 1, 2, 3, 'APPROVE');
@@ -16,10 +16,10 @@ insert into step_transition values (2, 1, 2, 3, 'APPROVE');
 
 Insert into process_def values (2, 'EXPENSE_APPLICATION');
 
-Insert into step_def values (4, 'EXP_INITIATED', 2, 'CITY_MANAGER', true, false);
-Insert into step_def values (5, 'EXP_STATE_MANAGER_APPROVAL', 2, 'STATE_MANAGER', false, false);
-Insert into step_def values (6, 'EXP_APPROVED', 2, null, false, true);
-Insert into step_def values (7, 'EXP_REJECTED', 2, null, false, true);
+Insert into step_def values (4, 'EXP_INITIATED', 'PENDING_WITH_CITY_MANAGER', 2, 'CITY_MANAGER', true, false);
+Insert into step_def values (5, 'EXP_STATE_MANAGER_APPROVAL', 'PENDING_WITH_STATE_MANAGER', 2, 'STATE_MANAGER', false, false);
+Insert into step_def values (6, 'EXP_APPROVED', 'APPROVED', 2, null, false, true);
+Insert into step_def values (7, 'EXP_REJECTED', 'REJECTED', 2, null, false, true);
 
 insert into step_transition values (3, 2, 1, 2, 'APPROVE');
 insert into step_transition values (4, 2, 2, 3, 'APPROVE');

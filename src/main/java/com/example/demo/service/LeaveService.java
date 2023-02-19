@@ -3,7 +3,6 @@ package com.example.demo.service;
 import com.example.demo.LeaveController;
 import com.example.demo.entity.Approver;
 import com.example.demo.entity.Leave;
-import com.example.demo.entity.LeaveStatus;
 import com.example.demo.entity.LeaveStep;
 import com.example.demo.entity.ProcessDef;
 import com.example.demo.entity.StepDef;
@@ -44,7 +43,12 @@ public class LeaveService {
 
         Approver approver = approverService.getApprover(leave.getCity(), firstStepDef.getApproverRole());
         createPendingStep(leave.getRequestId(), firstStepDef.getStepId(), approver.getId());
-        return leave;
+        return updateLeaveStatus(leave, firstStepDef.getProcessStatus());
+    }
+
+    public Leave updateLeaveStatus(Leave leave, String processStatus) {
+        leave.setStatus(processStatus);
+        return leaveRepository.save(leave);
     }
 
     public Leave approveCurrentLeaveStep(Integer userId, Integer leaveId, String remark) {
@@ -69,17 +73,16 @@ public class LeaveService {
     public void nextStep(Integer leaveId, String city, Integer pendingStepDefId) {
         ProcessDef leaveProcessDef = processService.getProcess(LEAVE_APPLICATION_PROCESS_NAME);
         StepDef nextStep = processService.getNextStep(leaveProcessDef.getProcessId(), pendingStepDefId, APPROVE);
-        if (nextStep.isTerminalStep()) {
-            createCompletedStep(leaveId, nextStep.getStepId(), null);
-            completeLeaveRequest(leaveId, LeaveStatus.APPROVED);
-        } else {
-            Integer approverId = approverService.getApprover(city, nextStep.getApproverRole()).getUserId();
-            createPendingStep(leaveId, nextStep.getStepId(), approverId);
-        }
+        Integer approverId = nextStep.isTerminalStep() ? null : approverService.getApprover(city,
+                                                                                            nextStep.getApproverRole())
+                                                                               .getUserId();
+
+        createPendingStep(leaveId, nextStep.getStepId(), approverId);
+        updateLeaveStatus(findLeaveById(leaveId), nextStep.getProcessStatus());
 
     }
 
-    private void completeLeaveRequest(Integer leaveId, LeaveStatus leaveStatus) {
+    private void completeLeaveRequest(Integer leaveId, String leaveStatus) {
         Leave leave = findLeaveById(leaveId);
         leave.setStatus(leaveStatus);
         leaveRepository.save(leave);

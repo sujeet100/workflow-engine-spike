@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,9 +28,8 @@ public class Leave {
     @Column(name = "number_of_days", nullable = true)
     private Integer numberOfDays;
     @Basic
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = true, length = 50)
-    private LeaveStatus status;
+    private String status;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "requested_by_user_id")
     private AppUser appUserByRequestedByUserId;
@@ -70,11 +67,11 @@ public class Leave {
     }
 
 
-    public LeaveStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(LeaveStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
