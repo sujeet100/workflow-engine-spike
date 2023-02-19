@@ -10,7 +10,6 @@ import com.example.demo.entity.StepDef;
 import com.example.demo.entity.StepStatus;
 import com.example.demo.repository.LeaveRepository;
 import com.example.demo.repository.LeaveStepRepository;
-import com.example.demo.repository.ProcessDefRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +23,6 @@ public class LeaveService {
     public static final String LEAVE_APPLICATION_PROCESS_NAME = "LEAVE_APPLICATION";
     private final LeaveRepository leaveRepository;
     private final LeaveStepRepository leaveStepRepository;
-    private final ProcessDefRepository processDefRepository;
     private final ApproverService approverService;
 
     private final ProcessService processService;
@@ -32,25 +30,17 @@ public class LeaveService {
 
     public LeaveService(LeaveRepository leaveRepository,
                         LeaveStepRepository leaveStepRepository,
-                        ProcessDefRepository processDefRepository,
                         ApproverService approverService, ProcessService processService) {
 
         this.leaveRepository = leaveRepository;
         this.leaveStepRepository = leaveStepRepository;
-        this.processDefRepository = processDefRepository;
         this.approverService = approverService;
         this.processService = processService;
     }
 
     public Leave initLeave(Leave leaveRequest) {
         Leave leave = leaveRepository.save(leaveRequest);
-        ProcessDef leaveProcessDef = processDefRepository.findByName(LEAVE_APPLICATION_PROCESS_NAME);
-        StepDef firstStepDef = leaveProcessDef.getSteps()
-                                              .stream()
-                                              .filter(StepDef::getInitialStep)
-                                              .findFirst()
-                                              .orElseThrow(() -> new RuntimeException(
-                                                      "Incorrect process definition. No initial step found."));
+        StepDef firstStepDef = processService.getInitialStep();
 
         Approver approver = approverService.getApprover(leave.getCity(), firstStepDef.getApproverRole());
         createPendingStep(leave.getRequestId(), firstStepDef.getStepId(), approver.getId());
@@ -59,14 +49,14 @@ public class LeaveService {
 
     public Leave approveCurrentLeaveStep(Integer userId, Integer leaveId, String remark) {
         Leave leave = findLeaveById(leaveId);
-        LeaveStep pendingStep = leave.getPendingStep();
-        if (!pendingStep.getApproverId().equals(userId)) {
+        LeaveStep currentStep = leave.getPendingStep();
+        if (!currentStep.getApproverId().equals(userId)) {
             throw new RuntimeException("The request %s is not pending for approval with you. You cannot approve it."
                                                .formatted(leaveId));
         }
-        completeStep(pendingStep, remark);
+        completeStep(currentStep, remark);
 
-        nextStep(leaveId, leave.getCity(), pendingStep.getStepDefId());
+        nextStep(leaveId, leave.getCity(), currentStep.getStepDefId());
         return findLeaveById(leaveId);
     }
 

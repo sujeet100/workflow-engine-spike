@@ -18,14 +18,24 @@ public class ProcessService {
         this.processDefRepository = processDefRepository;
     }
 
-    ProcessDef getProcess(String name) {
+    public ProcessDef getProcess(String name) {
         return processDefRepository.findByName(name);
     }
 
-    StepDef getNextStep(Integer processId, Integer currentStepDefId, String action) {
+    public StepDef getNextStep(Integer processId, Integer currentStepDefId, String action) {
         return stepTransitionRepository.findByProcessIdAndCurrentStepIdAndAction(processId,
                                                                                  currentStepDefId,
                                                                                  action)
                                        .getStepDefByNextStepId();
+    }
+
+    public StepDef getInitialStep() {
+        ProcessDef leaveProcessDef = processDefRepository.findByName(LeaveService.LEAVE_APPLICATION_PROCESS_NAME);
+        return leaveProcessDef.getSteps()
+                              .stream()
+                              .filter(StepDef::getInitialStep)
+                              .findFirst()
+                              .orElseThrow(() -> new RuntimeException(
+                                      "Incorrect process definition. No initial step found."));
     }
 }
