@@ -29,13 +29,13 @@ public class ProcessService {
                                        .getStepDefByNextStepId();
     }
 
-    public StepDef getInitialStep() {
-        ProcessDef leaveProcessDef = processDefRepository.findByName(LeaveService.LEAVE_APPLICATION_PROCESS_NAME);
-        return leaveProcessDef.getSteps()
-                              .stream()
-                              .filter(StepDef::getInitialStep)
-                              .findFirst()
-                              .orElseThrow(() -> new RuntimeException(
-                                      "Incorrect process definition. No initial step found."));
+    public StepDef getInitialStep(String processName) {
+        ProcessDef processDef = processDefRepository.findByName(processName);
+        return processDef.getSteps()
+                         .stream()
+                         .filter(StepDef::getInitialStep)
+                         .findFirst()
+                         .orElseThrow(() -> new RuntimeException(
+                                 "Incorrect process definition. No initial step found."));
     }
 }

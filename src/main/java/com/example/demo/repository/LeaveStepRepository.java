@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface LeaveStepRepository extends CrudRepository<LeaveStep, Integer> {
+public interface LeaveStepRepository extends CrudRepository<LeaveStep, Integer>, ProcessStepRepository<LeaveStep> {
 
     List<LeaveStep> findByApproverIdAndStatus(Integer approverId, StepStatus status);
 }

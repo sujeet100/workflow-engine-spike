@@ -33,19 +33,19 @@ public class LeaveController {
 
         leaveRequest.setAppUserByRequestedByUserId(requestedByUserId);
 
-        return leaveService.initLeave(leaveRequest);
+        return leaveService.initProcessInstance(leaveRequest);
     }
 
     @GetMapping("/user/{userId}/leavesPendingApproval")
     @ResponseBody
     List<Leave> leavesPendingApproval(@PathVariable Integer userId) {
-        return leaveService.getLeavesPendingApproval(userId, this);
+        return leaveService.getProcessInstancesPendingApproval(userId);
     }
 
     @GetMapping("/user/{userId}/approveLeaveStep/{leaveId}")
     @ResponseBody
     Leave approveLeaveStep(@PathVariable Integer userId, @PathVariable Integer leaveId) {
-        return leaveService.approveCurrentLeaveStep(userId, leaveId, "The leave is approved");
+        return leaveService.approveCurrentProcessStep(userId, leaveId, "The leave is approved");
     }
 
 

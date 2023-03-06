@@ -18,7 +18,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "leave_step", schema = "public", catalog = "workflow")
-public class LeaveStep {
+public class LeaveStep implements ProcessStep<Leave> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "step_id", nullable = false)
@@ -61,42 +61,52 @@ public class LeaveStep {
 
     }
 
+    @Override
     public int getStepId() {
         return stepId;
     }
 
+    @Override
     public void setStepId(int stepId) {
         this.stepId = stepId;
     }
 
-    public Integer getLeaveRequestId() {
+    @Override
+    public Integer getRequestId() {
         return leaveRequestId;
     }
 
-    public void setLeaveRequestId(Integer leaveRequestId) {
+    @Override
+    public void setRequestId(Integer leaveRequestId) {
         this.leaveRequestId = leaveRequestId;
     }
 
+    @Override
     public StepStatus getStatus() {
         return status;
     }
 
+    @Override
     public void setStatus(StepStatus status) {
         this.status = status;
     }
 
+    @Override
     public String getRemark() {
         return remark;
     }
 
+    @Override
     public void setRemark(String remark) {
         this.remark = remark;
     }
 
+    @Override
     public Integer getApproverId() {
         return approverId;
     }
 
+    @Override
     public void setApproverId(Integer approverId) {
         this.approverId = approverId;
     }
@@ -123,10 +133,6 @@ public class LeaveStep {
         return Objects.hash(stepId, leaveRequestId, status, remark, approverId);
     }
 
-    public Leave getLeaveByLeaveRequestId() {
-        return leaveByLeaveRequestId;
-    }
-
     public void setLeaveByLeaveRequestId(Leave leaveByLeaveRequestId) {
         this.leaveByLeaveRequestId = leaveByLeaveRequestId;
     }
@@ -140,11 +146,19 @@ public class LeaveStep {
         this.appUserByApproverId = appUserByApproverId;
     }
 
+    @Override
     public int getStepDefId() {
         return stepDefId;
     }
 
+    @Override
     public void setStepDefId(int stepDefId) {
         this.stepDefId = stepDefId;
+    }
+
+    @Override
+    @JsonIgnore
+    public Leave getProcessInstanceByProcessInstanceId() {
+        return leaveByLeaveRequestId;
     }
 }

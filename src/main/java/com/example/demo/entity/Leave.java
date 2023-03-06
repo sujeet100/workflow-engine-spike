@@ -19,7 +19,7 @@ import java.util.Set;
 import static com.example.demo.entity.StepStatus.PENDING;
 
 @Entity
-public class Leave {
+public class Leave implements ProcessEntity<LeaveStep> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "request_id", nullable = false)
@@ -38,10 +38,12 @@ public class Leave {
     @JsonManagedReference
     private Set<LeaveStep> steps;
 
+    @Override
     public String getCity() {
         return getAppUserByRequestedByUserId().getCity();
     }
 
+    @Override
     @JsonIgnore
     public LeaveStep getPendingStep() {
         return getSteps().stream()
@@ -50,10 +52,12 @@ public class Leave {
                          .orElseThrow(() -> new RuntimeException("No pending step found"));
     }
 
+    @Override
     public int getRequestId() {
         return requestId;
     }
 
+    @Override
     public void setRequestId(int requestId) {
         this.requestId = requestId;
     }
@@ -67,10 +71,12 @@ public class Leave {
     }
 
 
+    @Override
     public String getStatus() {
         return status;
     }
 
+    @Override
     public void setStatus(String status) {
         this.status = status;
     }
@@ -94,18 +100,22 @@ public class Leave {
         return Objects.hash(requestId, numberOfDays, status);
     }
 
+    @Override
     public AppUser getAppUserByRequestedByUserId() {
         return appUserByRequestedByUserId;
     }
 
+    @Override
     public void setAppUserByRequestedByUserId(AppUser appUserByRequestedByUserId) {
         this.appUserByRequestedByUserId = appUserByRequestedByUserId;
     }
 
+    @Override
     public Set<LeaveStep> getSteps() {
         return steps;
     }
 
+    @Override
     public void setSteps(Set<LeaveStep> steps) {
         this.steps = steps;
     }
