@@ -5,6 +5,7 @@ import com.example.demo.entity.ProcessStep;
 import com.example.demo.entity.StepStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface WorkflowService<T extends ProcessEntity<? extends ProcessStep>, R extends ProcessStep> {
     T initProcessInstance(T request);
@@ -28,4 +29,6 @@ public interface WorkflowService<T extends ProcessEntity<? extends ProcessStep>,
     R createStep(Integer processInstanceId, Integer stepDefId, StepStatus stepStatus, Integer approverId);
 
     List<T> getProcessInstancesPendingApproval(Integer userId);
+
+    Optional<String> getCondition(T processInstance);
 }

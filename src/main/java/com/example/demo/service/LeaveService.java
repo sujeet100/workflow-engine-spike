@@ -7,6 +7,8 @@ import com.example.demo.repository.LeaveRepository;
 import com.example.demo.repository.LeaveStepRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class LeaveService extends WorkflowServiceImpl<Leave, LeaveStep> {
     public static final String LEAVE_APPLICATION_PROCESS_NAME = "LEAVE_APPLICATION";
@@ -16,7 +18,7 @@ public class LeaveService extends WorkflowServiceImpl<Leave, LeaveStep> {
                         ApproverService approverService,
                         ProcessService processService) {
         super(LEAVE_APPLICATION_PROCESS_NAME,
-              processStepRepository, processEntityRepository, approverService, processService);
+              processStepRepository, processEntityRepository, approverService, transitionRulesService, processService);
     }
 
 
@@ -27,5 +29,10 @@ public class LeaveService extends WorkflowServiceImpl<Leave, LeaveStep> {
                              String remark,
                              Integer approverId) {
         return new LeaveStep(leaveRequestId, stepDefId, stepStatus, remark, approverId);
+    }
+
+    @Override
+    public Optional<String> getCondition(Leave leave) {
+        return leave.getNumberOfDays() > 10 ? Optional.of("LONG_LEAVE") : Optional.empty();
     }
 }

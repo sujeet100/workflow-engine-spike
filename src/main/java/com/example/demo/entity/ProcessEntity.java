@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Optional;
 import java.util.Set;
 
 public interface ProcessEntity<T extends ProcessStep> {

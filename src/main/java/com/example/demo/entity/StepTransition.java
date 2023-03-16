@@ -31,6 +31,10 @@ public class StepTransition {
     @Basic
     @Column(name = "action", nullable = true, length = 50)
     private String action;
+
+    @Basic
+    @Column(name = "condition", nullable = true, length = 50)
+    private String condition;
     @ManyToOne
     @JoinColumn(name = "process_id", referencedColumnName = "process_id", insertable = false, updatable = false)
     private ProcessDef processDefByProcessId;
@@ -124,5 +128,13 @@ public class StepTransition {
 
     public void setStepDefByNextStepId(StepDef stepDefByNextStepId) {
         this.stepDefByNextStepId = stepDefByNextStepId;
+    }
+
+    public RuleData getCondition() {
+        return null;
+    }
+
+    public void setCondition(String rule) {
+        this.condition = rule;
     }
 }

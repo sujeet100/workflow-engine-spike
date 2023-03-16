@@ -6,10 +6,12 @@ import com.example.demo.entity.ProcessEntity;
 import com.example.demo.entity.ProcessStep;
 import com.example.demo.entity.StepDef;
 import com.example.demo.entity.StepStatus;
+import com.example.demo.entity.StepTransition;
 import com.example.demo.repository.ProcessEntityRepository;
 import com.example.demo.repository.ProcessStepRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.demo.entity.StepAction.APPROVE;
 import static com.example.demo.entity.StepStatus.COMPLETED;
@@ -21,16 +23,21 @@ public abstract class WorkflowServiceImpl<T extends ProcessEntity<? extends Proc
     private final ApproverService approverService;
     private final ProcessStepRepository<R> processStepRepository;
 
+    private final TransitionRulesService<T> transitionRulesService;
+
     private final ProcessService processService;
 
 
     public WorkflowServiceImpl(String processName, ProcessStepRepository<R> processStepRepository,
                                ProcessEntityRepository<T> processEntityRepository,
-                               ApproverService approverService, ProcessService processService) {
+                               ApproverService approverService,
+                               TransitionRulesService<T> transitionRulesService,
+                               ProcessService processService) {
         this.processName = processName;
         this.processStepRepository = processStepRepository;
         this.processEntityRepository = processEntityRepository;
         this.approverService = approverService;
+        this.transitionRulesService = transitionRulesService;
         this.processService = processService;
     }
 
@@ -38,6 +45,11 @@ public abstract class WorkflowServiceImpl<T extends ProcessEntity<? extends Proc
     public T initProcessInstance(T processRequest) {
         T processInstance = processEntityRepository.save(processRequest);
         StepDef firstStepDef = processService.getInitialStep(processName);
+
+        /*switch (processInstance) {
+            case ProcessEntity p -> //get approver
+            case ProcessEntityWithVertical v -> v.getVerticalCode(); //get approver for give vertical
+        }*/
 
         Approver approver = approverService.getApprover(processInstance.getCity(), firstStepDef.getApproverRole());
         createPendingStep(processInstance.getRequestId(), firstStepDef.getStepId(), approver.getId());
@@ -60,9 +72,14 @@ public abstract class WorkflowServiceImpl<T extends ProcessEntity<? extends Proc
         }
         completeStep(currentStep, remark);
 
+        //option 1
+        Optional<String> condition = getCondition(processInstance);
+
         nextStep(processInstanceId, processInstance.getCity(), currentStep.getStepDefId());
         return findProcessInstanceById(processInstanceId);
     }
+
+    public abstract Optional<String> getCondition(T processInstance);
 
     @Override
     public T findProcessInstanceById(Integer processInstanceId) {
@@ -76,6 +93,17 @@ public abstract class WorkflowServiceImpl<T extends ProcessEntity<? extends Proc
     public void nextStep(Integer processInstanceId, String city, Integer pendingStepDefId) {
         ProcessDef processDef = processService.getProcess(processName);
         StepDef nextStep = processService.getNextStep(processDef.getProcessId(), pendingStepDefId, APPROVE);
+
+        //option 2
+        T processInstance = findProcessInstanceById(processInstanceId);
+        Optional<StepTransition> next = processService.getNextSteps(processDef.getProcessId(),
+                                                                     pendingStepDefId,
+                                                                     APPROVE)
+                                                       .stream()
+                                                       .filter(t -> transitionRulesService.matchesRule(t.getCondition(),
+                                                                                                       processInstance))
+                                                       .findFirst();
+
         Integer approverId = nextStep.isTerminalStep() ? null : approverService.getApprover(city,
                                                                                             nextStep.getApproverRole())
                                                                                .getUserId();
